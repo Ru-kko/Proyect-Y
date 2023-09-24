@@ -1,6 +1,7 @@
 package service
 
 import (
+	"Proyect-Y/auth-service/internal/security"
 	"Proyect-Y/auth-service/internal/storage"
 	"Proyect-Y/auth-service/internal/storage/mongo"
 	"Proyect-Y/auth-service/internal/storage/redis"
@@ -11,7 +12,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type dataService struct {
+type DataService struct {
 	wg     sync.WaitGroup
 	broker *stream.UserProducer
 	mongo  storage.UserStore
@@ -19,7 +20,7 @@ type dataService struct {
 	logger *logrus.Logger
 }
 
-func NewDataService() (*dataService, error) {
+func NewDataService() (*DataService, error) {
 	logger := logrus.New()
 
 	broker, err := stream.NewUserProducer()
@@ -34,7 +35,7 @@ func NewDataService() (*dataService, error) {
 
 	cache := redis.NewCache()
 
-	return &dataService{
+	return &DataService{
 		mongo:  mongo,
 		broker: broker,
 		cache:  cache,
@@ -42,16 +43,21 @@ func NewDataService() (*dataService, error) {
 	}, nil
 }
 
-func (sv *dataService) manageErr(component string, err error) {
+func (sv *DataService) manageErr(component string, err error) {
 	if err != nil {
 		sv.logger.WithError(err).Error(component + " error: ")
 	}
 }
 
-func (sv *dataService) UserRegister(rg typo.RegisterData) (*typo.AuthData, error) {
+func (sv *DataService) UserRegister(rg typo.RegisterData) (*typo.AuthData, error) {
+	hashedPsw, err := security.EncryptPassword(rg.Password)
+	if err != nil {
+		return nil, err
+	}
+
 	auth := typo.AuthData{
 		Email:    rg.Email,
-		Password: rg.Password, // TODO encrypt this
+		Password: hashedPsw,
 		Roles:    typo.User_Rol,
 		UserTag:  rg.UserTag,
 		BornDate: rg.BornDate,
@@ -84,7 +90,7 @@ func (sv *dataService) UserRegister(rg typo.RegisterData) (*typo.AuthData, error
 	return res, nil
 }
 
-func (sv *dataService) GetUser(id string) (*typo.AuthData, error) {
+func (sv *DataService) GetUser(id string) (*typo.AuthData, error) {
 	var res *typo.AuthData = nil
 
 	res, err := sv.cache.Get(id)
@@ -108,7 +114,7 @@ func (sv *dataService) GetUser(id string) (*typo.AuthData, error) {
 	return res, nil
 }
 
-func (sv *dataService) GetUserByTag(tag string) (*typo.AuthData, error) {
+func (sv *DataService) GetUserByTag(tag string) (*typo.AuthData, error) {
 	var res *typo.AuthData = nil
 
 	res, err := sv.cache.GetByUserTag(tag)
@@ -131,7 +137,7 @@ func (sv *dataService) GetUserByTag(tag string) (*typo.AuthData, error) {
 	return res, nil
 }
 
-func (sv *dataService) UpdateUser(usr typo.AuthData) (*typo.AuthData, error) {
+func (sv *DataService) UpdateUser(usr typo.AuthData) (*typo.AuthData, error) {
 	res, err := sv.mongo.Edit(usr)
 	if err != nil {
 		return nil, err
@@ -155,7 +161,7 @@ func (sv *dataService) UpdateUser(usr typo.AuthData) (*typo.AuthData, error) {
 	return res, nil
 }
 
-func (sv *dataService) Delete(id string) error {
+func (sv *DataService) Delete(id string) error {
 	err := sv.mongo.Delete(id)
 
 	if err != nil {
@@ -178,7 +184,7 @@ func (sv *dataService) Delete(id string) error {
 	return nil
 }
 
-func (sv *dataService) CloseAll() {
+func (sv *DataService) CloseAll() {
 	sv.wg.Wait()
 
 	sv.manageErr("Kafka", sv.broker.Close())
