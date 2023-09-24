@@ -13,13 +13,13 @@ import (
 
 type MongoClient struct {
 	coll *mongo.Collection
+	conn *mongo.Client
 }
 
-func NewMongoAuthClient() (MongoClient, error) {
+func NewMongoAuthClient() (*MongoClient, error) {
 	client, err := connection()
-
 	if err != nil {
-		return MongoClient{}, err
+		return nil, err
 	}
 
 	collection := client.Database("auth").Collection("users")
@@ -35,9 +35,31 @@ func NewMongoAuthClient() (MongoClient, error) {
 	}
 	collection.Indexes().CreateMany(context.TODO(), indexes)
 
-	return MongoClient{
+	return &MongoClient{
 		coll: collection,
+		conn: client,
 	}, nil
+}
+
+func (cl *MongoClient) Close() error {
+	return cl.conn.Disconnect(context.TODO())
+}
+
+func (cl *MongoClient) GetByUserTag(tag string) (*typo.AuthData, error) {
+	res := &typo.AuthData{}
+	data := cl.coll.FindOne(context.TODO(), bson.M{"user_tag": tag})
+
+	err := data.Decode(res)
+	if err != nil {
+		switch err {
+		case mongo.ErrNoDocuments:
+			return nil, nil
+		default:
+			return nil, err
+		}
+	}
+
+	return res, err
 }
 
 func (cl *MongoClient) Get(id string) (*typo.AuthData, error) {
@@ -48,14 +70,19 @@ func (cl *MongoClient) Get(id string) (*typo.AuthData, error) {
 
 	data := cl.coll.FindOne(context.TODO(), bson.M{"_id": objid})
 
-	res := typo.AuthData{}
+	res := &typo.AuthData{}
 	err = data.Decode(res)
 
 	if err != nil {
-		return nil, err
+		switch err {
+		case mongo.ErrNoDocuments:
+			return nil, nil
+		default:
+			return nil, err
+		}
 	}
 
-	return &res, nil
+	return res, nil
 }
 
 func (cl *MongoClient) Save(usr typo.AuthData) (*typo.AuthData, error) {
@@ -69,14 +96,17 @@ func (cl *MongoClient) Save(usr typo.AuthData) (*typo.AuthData, error) {
 	return &usr, nil
 }
 
-func (cl *MongoClient) Edit(user typo.AuthData) error {
+func (cl *MongoClient) Edit(user typo.AuthData) (*typo.AuthData, error) {
 	clone := user
 	clone.Id = ""
 	parsed := util.StructToMap(clone)
 
 	_, err := cl.coll.UpdateOne(context.TODO(), bson.M{"_id": user.Id}, parsed)
+	if err != nil {
+		return nil, err
+	}
 
-	return err
+	return cl.Get(user.Id)
 }
 
 func (cl *MongoClient) Delete(id string) error {
