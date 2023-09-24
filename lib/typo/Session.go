@@ -11,6 +11,12 @@ type AuthData struct {
 	Email    string `json:"email" bson:"email"`
 }
 
+type AuthChange struct {
+	Id       string `json:"id,omitempty" bson:"_id,omitempty"`
+	UserTag  string `json:"user_tag" bson:"user_tag"`
+	BornDate string `json:"born_date" bson:"born_date"`
+}
+
 type RegisterData struct {
 	UserTag   string             `json:"user_tag" bson:"user_tag"`
 	BornDate  string             `json:"born_date" bson:"born_date"`
