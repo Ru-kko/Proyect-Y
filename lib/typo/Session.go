@@ -2,24 +2,17 @@ package typo
 
 import "Proyect-Y/typo/constants/locations"
 
-type AuthData struct {
-	Id       string `json:"id,omitempty" bson:"_id,omitempty"`
-	UserTag  string `json:"user_tag" bson:"user_tag" binding:"required,gte=4"`
-	BornDate string `json:"born_date" bson:"born_date" binding:"required"`
-	Password string `json:"passwrod" bson:"passwrod" binding:"required"`
-	Roles    role   `json:"roles" bson:"roles"`
-	Email    string `json:"email" bson:"email" binding:"required,email"`
-}
-
 type AuthChange struct {
 	Id       string `json:"id,omitempty" bson:"_id,omitempty" binding:"required"`
 	UserTag  string `json:"user_tag" bson:"user_tag" binding:"gte=4"`
 	BornDate string `json:"born_date" bson:"born_date"`
 }
 
-type AuthCredentials struct {
-	UserTag  string `json:"user_tag" binding:"required,gte=4"`
-	Password string `json:"passwrod" binding:"required"`
+type AuthenticationInfo struct {
+	Id            string `json:"id,omitempty"`
+	UserTag       string `json:"user_tag,omitempty"`
+	Authenticated bool   `json:"authenticated"`
+	Roles         []Role `json:"roles" binding:"required"`
 }
 
 type RegisterData struct {
@@ -32,9 +25,10 @@ type RegisterData struct {
 	LastName  string             `json:"last_name,omitempty" bson:"last_name,omitempty" `
 }
 
-type role string
+type Role string
 
 const (
-	Admin_Rol role = "admin"
-	User_Rol  role = "user"
+	No_Auth   Role = "unauth"
+	Admin_Rol Role = "admin"
+	User_Rol  Role = "user"
 )

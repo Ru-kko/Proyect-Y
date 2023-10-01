@@ -1,6 +1,7 @@
 package service
 
 import (
+	"Proyect-Y/auth-service/internal/domain"
 	"Proyect-Y/auth-service/internal/security"
 	"Proyect-Y/auth-service/internal/storage"
 	"Proyect-Y/auth-service/internal/storage/mongo"
@@ -49,13 +50,13 @@ func (sv *DataService) manageErr(component string, err error) {
 	}
 }
 
-func (sv *DataService) UserRegister(rg typo.RegisterData) (*typo.AuthData, error) {
+func (sv *DataService) UserRegister(rg typo.RegisterData) (*domain.StoredUser, error) {
 	hashedPsw, err := security.EncryptPassword(rg.Password)
 	if err != nil {
 		return nil, err
 	}
 
-	auth := typo.AuthData{
+	auth := domain.StoredUser{
 		Email:    rg.Email,
 		Password: hashedPsw,
 		Roles:    typo.User_Rol,
@@ -90,8 +91,8 @@ func (sv *DataService) UserRegister(rg typo.RegisterData) (*typo.AuthData, error
 	return res, nil
 }
 
-func (sv *DataService) GetUser(id string) (*typo.AuthData, error) {
-	var res *typo.AuthData = nil
+func (sv *DataService) GetUser(id string) (*domain.StoredUser, error) {
+	var res *domain.StoredUser = nil
 
 	res, err := sv.cache.Get(id)
 	if err != nil || res != nil {
@@ -114,8 +115,8 @@ func (sv *DataService) GetUser(id string) (*typo.AuthData, error) {
 	return res, nil
 }
 
-func (sv *DataService) GetUserByTag(tag string) (*typo.AuthData, error) {
-	var res *typo.AuthData = nil
+func (sv *DataService) GetUserByTag(tag string) (*domain.StoredUser, error) {
+	var res *domain.StoredUser = nil
 
 	res, err := sv.cache.GetByUserTag(tag)
 	if err != nil || res != nil {
@@ -137,7 +138,7 @@ func (sv *DataService) GetUserByTag(tag string) (*typo.AuthData, error) {
 	return res, nil
 }
 
-func (sv *DataService) UpdateUser(usr typo.AuthData) (*typo.AuthData, error) {
+func (sv *DataService) UpdateUser(usr domain.StoredUser) (*domain.StoredUser, error) {
 	res, err := sv.mongo.Edit(usr)
 	if err != nil {
 		return nil, err
@@ -178,7 +179,7 @@ func (sv *DataService) Delete(id string) error {
 	go func() {
 		sv.wg.Add(1)
 		defer sv.wg.Done()
-		
+
 		sv.manageErr("Cache", sv.cache.Delete(id))
 	}()
 	return nil

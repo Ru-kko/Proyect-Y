@@ -1,7 +1,7 @@
 package redis
 
 import (
-	"Proyect-Y/typo"
+	"Proyect-Y/auth-service/internal/domain"
 	"Proyect-Y/typo/constants"
 	"context"
 	"encoding/json"
@@ -28,7 +28,7 @@ func (cl *UserCache) Close() error {
 	return cl.client.Close()
 }
 
-func (cl *UserCache) GetByUserTag(tag string) (*typo.AuthData, error) {
+func (cl *UserCache) GetByUserTag(tag string) (*domain.StoredUser, error) {
 	id, err := cl.client.Get(context.TODO(), "tag:"+tag).Result()
 	if err != nil {
 		switch err {
@@ -42,7 +42,7 @@ func (cl *UserCache) GetByUserTag(tag string) (*typo.AuthData, error) {
 	return cl.Get(id)
 }
 
-func (cl *UserCache) Get(id string) (*typo.AuthData, error) {
+func (cl *UserCache) Get(id string) (*domain.StoredUser, error) {
 	ctx := context.TODO()
 
 	res, err := cl.client.Get(ctx, id).Bytes()
@@ -61,7 +61,7 @@ func (cl *UserCache) Get(id string) (*typo.AuthData, error) {
 		cl.client.ExpireNX(ctx, id, constants.ExpTime)
 	}()
 
-	usr := &typo.AuthData{}
+	usr := &domain.StoredUser{}
 
 	if err = json.Unmarshal(res, usr); err != nil {
 		return nil, err
@@ -70,7 +70,7 @@ func (cl *UserCache) Get(id string) (*typo.AuthData, error) {
 	return usr, nil
 }
 
-func (cl *UserCache) Save(user typo.AuthData) (*typo.AuthData, error) {
+func (cl *UserCache) Save(user domain.StoredUser) (*domain.StoredUser, error) {
 	err := cl.client.Set(context.TODO(), user.Id, user, constants.ExpTime).Err()
 	if err != nil {
 		return nil, err
@@ -89,6 +89,6 @@ func (cl *UserCache) Delete(id string) error {
 	return err
 }
 
-func (cl *UserCache) Edit(usr typo.AuthData) (*typo.AuthData, error) {
+func (cl *UserCache) Edit(usr domain.StoredUser) (*domain.StoredUser, error) {
 	return cl.Save(usr)
 }

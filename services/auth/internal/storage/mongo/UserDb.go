@@ -1,8 +1,8 @@
 package mongo
 
 import (
+	"Proyect-Y/auth-service/internal/domain"
 	"Proyect-Y/auth-service/internal/util"
-	"Proyect-Y/typo"
 	"context"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -45,8 +45,8 @@ func (cl *MongoClient) Close() error {
 	return cl.conn.Disconnect(context.TODO())
 }
 
-func (cl *MongoClient) GetByUserTag(tag string) (*typo.AuthData, error) {
-	res := &typo.AuthData{}
+func (cl *MongoClient) GetByUserTag(tag string) (*domain.StoredUser, error) {
+	res := &domain.StoredUser{}
 	data := cl.coll.FindOne(context.TODO(), bson.M{"user_tag": tag})
 
 	err := data.Decode(res)
@@ -62,7 +62,7 @@ func (cl *MongoClient) GetByUserTag(tag string) (*typo.AuthData, error) {
 	return res, err
 }
 
-func (cl *MongoClient) Get(id string) (*typo.AuthData, error) {
+func (cl *MongoClient) Get(id string) (*domain.StoredUser, error) {
 	objid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -70,7 +70,7 @@ func (cl *MongoClient) Get(id string) (*typo.AuthData, error) {
 
 	data := cl.coll.FindOne(context.TODO(), bson.M{"_id": objid})
 
-	res := &typo.AuthData{}
+	res := &domain.StoredUser{}
 	err = data.Decode(res)
 
 	if err != nil {
@@ -85,7 +85,7 @@ func (cl *MongoClient) Get(id string) (*typo.AuthData, error) {
 	return res, nil
 }
 
-func (cl *MongoClient) Save(usr typo.AuthData) (*typo.AuthData, error) {
+func (cl *MongoClient) Save(usr domain.StoredUser) (*domain.StoredUser, error) {
 	data, err := cl.coll.InsertOne(context.TODO(), usr)
 	if err != nil {
 		return nil, err
@@ -96,7 +96,7 @@ func (cl *MongoClient) Save(usr typo.AuthData) (*typo.AuthData, error) {
 	return &usr, nil
 }
 
-func (cl *MongoClient) Edit(user typo.AuthData) (*typo.AuthData, error) {
+func (cl *MongoClient) Edit(user domain.StoredUser) (*domain.StoredUser, error) {
 	clone := user
 	clone.Id = ""
 	parsed := util.StructToMap(clone)

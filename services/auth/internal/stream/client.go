@@ -1,6 +1,7 @@
 package stream
 
 import (
+	"Proyect-Y/auth-service/internal/domain"
 	"Proyect-Y/auth-service/internal/util"
 	"Proyect-Y/typo"
 	"Proyect-Y/typo/constants/kafka"
@@ -81,7 +82,7 @@ func (p *UserProducer) Delete(id string) error {
 	return err
 }
 
-func (p *UserProducer) Update(changes typo.AuthData) error {
+func (p *UserProducer) Update(changes domain.StoredUser) error {
 	data := typo.ActionPublisher[typo.AuthChange]{
 		Data: typo.AuthChange{
 			Id: changes.Id,
