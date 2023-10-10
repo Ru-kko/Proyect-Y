@@ -77,7 +77,7 @@ func (sv *DataService) UserRegister(rg typo.RegisterData) (*domain.StoredUser, e
 		sv.wg.Add(1)
 		defer sv.wg.Done()
 
-		sv.manageErr("Kafka", sv.broker.POST(msg))
+		sv.manageErr("Rabbit", sv.broker.POST(msg))
 	}()
 
 	go func() {
@@ -148,7 +148,7 @@ func (sv *DataService) UpdateUser(usr domain.StoredUser) (*domain.StoredUser, er
 		sv.wg.Add(1)
 		defer sv.wg.Done()
 
-		sv.manageErr("Kafka", sv.broker.Update(*res))
+		sv.manageErr("Rabbit", sv.broker.Update(*res))
 	}()
 
 	go func() {
@@ -173,7 +173,7 @@ func (sv *DataService) Delete(id string) error {
 		sv.wg.Add(1)
 		defer sv.wg.Done()
 
-		sv.manageErr("Kafka", sv.broker.Delete(id))
+		sv.manageErr("Rabbit", sv.broker.Delete(id))
 	}()
 
 	go func() {
@@ -188,7 +188,7 @@ func (sv *DataService) Delete(id string) error {
 func (sv *DataService) CloseAll() {
 	sv.wg.Wait()
 
-	sv.manageErr("Kafka", sv.broker.Close())
+	sv.manageErr("Rabbit", sv.broker.Close())
 	sv.manageErr("Mongo", sv.mongo.Close())
 	sv.manageErr("Cache", sv.cache.Close())
 }

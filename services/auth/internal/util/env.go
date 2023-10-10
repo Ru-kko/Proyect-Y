@@ -14,7 +14,7 @@ type enviroment struct {
 	REDIS_HOST string
 	REDIS_PSW  string
 
-	KAFKA_BROKERS string // NOTE ip's separated by "-", example "localhost:8000-172.0.0.1:4000"
+	AMQP_URI string
 
 	JWT_SECRET string
 }
