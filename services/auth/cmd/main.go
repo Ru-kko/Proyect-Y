@@ -2,8 +2,8 @@ package main
 
 import (
 	"os"
-	"strconv"
 
+	"Proyect-Y/auth-service/internal/server"
 	"Proyect-Y/auth-service/internal/util"
 
 	"github.com/gin-gonic/gin"
@@ -13,9 +13,7 @@ func main() {
 	if os.Getenv("PROD") == "true" {
 		gin.SetMode(gin.ReleaseMode)
 	}
+	env := util.GetEnv()
 
-	app := gin.Default()
-
-	
-	app.Run(":" + strconv.Itoa(util.GetEnv().PORT))
+	server.CreateServer(env.PORT)
 }
