@@ -3,6 +3,7 @@ go 1.21.1
 use (
 	./lib/apiErrors
 	./lib/common
+	./lib/middlewares
 	./lib/typo
 	./services/auth
 	./services/gateway
