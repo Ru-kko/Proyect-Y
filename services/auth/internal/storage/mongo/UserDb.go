@@ -91,7 +91,7 @@ func (cl *MongoClient) Save(usr domain.StoredUser) (*domain.StoredUser, error) {
 		return nil, err
 	}
 
-	usr.Id = data.InsertedID.(string)
+	usr.Id = data.InsertedID.(primitive.ObjectID).Hex()
 
 	return &usr, nil
 }
