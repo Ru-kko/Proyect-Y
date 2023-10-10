@@ -12,7 +12,7 @@ import (
 
 type UserCache struct {
 	client *redis.Client
-	wg sync.WaitGroup
+	wg     sync.WaitGroup
 }
 
 func NewCache() *UserCache {
@@ -55,8 +55,8 @@ func (cl *UserCache) Get(id string) (*domain.StoredUser, error) {
 		}
 	}
 
-	cl.wg.Add(1)
 	go func() {
+		cl.wg.Add(1)
 		defer cl.wg.Done()
 		cl.client.ExpireNX(ctx, id, constants.ExpTime)
 	}()
@@ -71,8 +71,12 @@ func (cl *UserCache) Get(id string) (*domain.StoredUser, error) {
 }
 
 func (cl *UserCache) Save(user domain.StoredUser) (*domain.StoredUser, error) {
-	err := cl.client.Set(context.TODO(), user.Id, user, constants.ExpTime).Err()
+	str, err := json.Marshal(user)
 	if err != nil {
+		return nil, err
+	}
+
+	if err = cl.client.Set(context.TODO(), user.Id, string(str), constants.ExpTime).Err(); err != nil {
 		return nil, err
 	}
 
