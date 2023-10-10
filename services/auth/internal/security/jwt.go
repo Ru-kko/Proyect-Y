@@ -19,7 +19,7 @@ func BuildToken(data domain.StoredUser) (string, int64, error) {
 		Iss:        now,
 	})
 
-	token, err := jwt.SignedString(env.JWT_SECRET)
+	token, err := jwt.SignedString([]byte(env.JWT_SECRET))
 	return token, expirationTime, err
 }
 
