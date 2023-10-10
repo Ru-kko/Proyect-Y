@@ -18,10 +18,10 @@ type AuthenticationInfo struct {
 type RegisterData struct {
 	UserTag   string             `json:"user_tag" bson:"user_tag" binding:"required,gte=4"`
 	BornDate  string             `json:"born_date" bson:"born_date" binding:"required"`
-	Password  string             `json:"passwrod" bson:"passwrod" binding:"required"`
+	Password  string             `json:"password" bson:"password" binding:"required"`
 	Email     string             `json:"email" bson:"email" binding:"required,email"`
 	Country   locations.Location `json:"country" bson:"country" binding:"required"`
-	FristName string             `json:"frist_name" bson:"frist_name" binding:"required"`
+	FirstName string             `json:"first_name" bson:"first_name" binding:"required"`
 	LastName  string             `json:"last_name,omitempty" bson:"last_name,omitempty" `
 }
 
