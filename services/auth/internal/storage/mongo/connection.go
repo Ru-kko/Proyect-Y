@@ -11,7 +11,7 @@ import (
 
 func connection() (*mongo.Client, error) {
 	env := util.GetEnv()
-	url := fmt.Sprintf("mongodb://%s:%s@%s/auth", env.MONGO_USR, env.MONGO_PSW, env.MONGO_HOST)
+	url := fmt.Sprintf("mongodb://%s:%s@%s/auth?authSource=admin", env.MONGO_USR, env.MONGO_PSW, env.MONGO_HOST)
 
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(url))
 	if err != nil {
