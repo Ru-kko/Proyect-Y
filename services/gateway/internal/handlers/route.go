@@ -1,4 +1,4 @@
-package routes
+package handlers
 
 import (
 	apierrors "Proyect-Y/api-errors"

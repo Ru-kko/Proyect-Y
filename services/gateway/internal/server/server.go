@@ -1,7 +1,7 @@
-package http
+package server
 
 import (
-	"Proyect-Y/gateway/internal/api/routes"
+	"Proyect-Y/gateway/internal/handlers"
 	"fmt"
 
 	"github.com/gin-gonic/gin"
@@ -10,7 +10,7 @@ import (
 func CreateServer(port int) {
 	app := gin.Default()
 
-	app.Any(":/service/*path", routes.Gateway)
+	app.Any(":/service/*path", handlers.Gateway)
 
 	app.Run(fmt.Sprintf(":%d", port))
 }
