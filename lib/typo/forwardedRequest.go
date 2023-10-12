@@ -9,6 +9,6 @@ type Auth struct {
 	Id            string `json:"id,omitempty"`
 	UserTag       string `json:"user_tag,omitempty" binding:"gte=4"`
 	Authenticated bool   `json:"authenticated" binding:"required"`
-	Roles         []Role `json:"roles"`
-	BornDate      string `json:"born_date" bson:"born_date"`
+	Roles         []Role `json:"roles,omitempty"`
+	BornDate      string `json:"born_date,omitempty" bson:"born_date"`
 }
