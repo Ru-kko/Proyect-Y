@@ -59,7 +59,7 @@ func (sv *DataService) UserRegister(rg typo.RegisterData) (*domain.StoredUser, e
 	auth := domain.StoredUser{
 		Email:    rg.Email,
 		Password: hashedPsw,
-		Roles:    typo.User_Rol,
+		Roles:    []typo.Role{typo.User_Rol},
 		UserTag:  rg.UserTag,
 		BornDate: rg.BornDate,
 	}
