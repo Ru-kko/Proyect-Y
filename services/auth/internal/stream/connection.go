@@ -23,3 +23,9 @@ func getConnection() (*amqp.Connection, error) {
 
 	return connection, err
 }
+
+func CloseRabbitConnection() {
+	if connection != nil {
+		connection.Close()
+	}
+}

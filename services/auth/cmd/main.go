@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"Proyect-Y/auth-service/internal/server"
+	"Proyect-Y/auth-service/internal/stream"
 	"Proyect-Y/auth-service/internal/util"
 
 	"github.com/gin-gonic/gin"
@@ -16,4 +17,6 @@ func main() {
 	env := util.GetEnv()
 
 	server.CreateServer(env.PORT)
+
+	defer stream.CloseRabbitConnection()
 }
