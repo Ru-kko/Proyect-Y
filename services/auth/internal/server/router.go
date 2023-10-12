@@ -14,3 +14,7 @@ func getAuthRoutes(e *gin.Engine) {
   router.POST("/signin", handlers.SignIn)
   router.POST("/signup", handlers.SignUp)
 }
+
+func getUserRoutes(e *gin.Engine) {
+  e.GET("/@me", middleware.DataServiceInject(), middleware.AutorizeMiddleware, handlers.Indentify)
+}
