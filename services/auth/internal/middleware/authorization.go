@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 const TokenScope = "Token"
@@ -29,18 +30,19 @@ func AutorizeMiddleware(c *gin.Context) {
 		return
 	}
 
-	c.Set("TokenScope", token)
+	c.Set(TokenScope, token)
 	c.Next()
 }
 
-func IsAuthenticated(c *gin.Context) (security.JWTclaims, bool) {
+func IsAuthenticated(c *gin.Context) (*security.JWTclaims, bool) {
 	auth, exists := c.Get(TokenScope)
 
 	if !exists {
-		return security.JWTclaims{}, false
+		return nil, false
 	}
 
-	val, ok := auth.(security.JWTclaims)
+	val, ok := auth.(*security.JWTclaims)
+	logrus.Info(val, ", ok:", ok, ", exists:", exists, ", auth:", auth)
 
 	return val, ok
 }
