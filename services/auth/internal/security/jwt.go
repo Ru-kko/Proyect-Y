@@ -14,7 +14,10 @@ func BuildToken(data domain.StoredUser) (string, int64, error) {
 	expirationTime := now + (60 * 60 * 24 * 12) // 12 days
 
 	jwt := jwt.NewWithClaims(jwt.SigningMethodHS256, &JWTclaims{
-		StoredUser: data,
+		AuthenticatedInfo: domain.AuthenticatedInfo {
+			Id: data.Id,
+			UserTag: data.UserTag,
+		},
 		Exp:        expirationTime,
 		Iss:        now,
 	})

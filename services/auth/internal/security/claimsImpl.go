@@ -8,7 +8,7 @@ import (
 )
 
 type JWTclaims struct {
-	domain.StoredUser
+	domain.AuthenticatedInfo
 	Iss int64
 	Exp int64
 }
