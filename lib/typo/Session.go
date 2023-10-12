@@ -8,13 +8,6 @@ type AuthChange struct {
 	BornDate string `json:"born_date" bson:"born_date"`
 }
 
-type AuthenticationInfo struct {
-	Id            string `json:"id,omitempty"`
-	UserTag       string `json:"user_tag,omitempty"`
-	Authenticated bool   `json:"authenticated"`
-	Roles         []Role `json:"roles" binding:"required"`
-}
-
 type RegisterData struct {
 	UserTag   string             `json:"user_tag" bson:"user_tag" binding:"required,gte=4"`
 	BornDate  string             `json:"born_date" bson:"born_date" binding:"required"`
