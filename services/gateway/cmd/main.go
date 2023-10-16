@@ -1,7 +1,7 @@
 package main
 
 import (
-	"Proyect-Y/gateway/internal/api/http"
+	"Proyect-Y/gateway/internal/server"
 	"Proyect-Y/gateway/internal/util"
 	"os"
 
@@ -13,5 +13,5 @@ func main() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	http.CreateServer(util.GetEnv().PORT)
+	server.CreateServer(util.GetEnv().PORT)
 }

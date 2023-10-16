@@ -10,7 +10,7 @@ import (
 func CreateServer(port int) {
 	app := gin.Default()
 
-	app.Any(":/service/*path", handlers.Gateway)
+	app.Any("/:service/*path", handlers.Gateway)
 
 	app.Run(fmt.Sprintf(":%d", port))
 }
