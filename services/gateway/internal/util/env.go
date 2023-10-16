@@ -1,26 +1,26 @@
 package util
 
-import ( 
-  ev "Proyect-Y/common/env"
+import (
+	ev "Proyect-Y/common/env"
 )
 
 type Enviroment struct {
-  PORT int
-  CONFIG string
+	PORT         int
+	CONFIG       string
+	AUTH_ADDRESS string
 }
 
 var env *Enviroment
 
-
 func GetEnv() Enviroment {
-  if  env != nil {
-    return *env
-  }
+	if env != nil {
+		return *env
+	}
 
-  env = &Enviroment{}
+	env = &Enviroment{}
 
-  ev.Load()
-  ev.Parse[Enviroment](env)
+	ev.Load()
+	ev.Parse[Enviroment](env)
 
-  return *env
+	return *env
 }
