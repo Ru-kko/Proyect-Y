@@ -13,10 +13,10 @@ import (
 )
 
 func SignUp(c *gin.Context) {
-	var data typo.RegisterData
+	var reqBody typo.ForwardedRequest[typo.RegisterData]
 	logger := logrus.New()
 
-	if err := c.ShouldBindJSON(&data); err != nil {
+	if err := c.ShouldBindJSON(&reqBody); err != nil {
 		c.JSON(http.StatusBadRequest, apierrors.BadRequest{
 			Name:    "BadRequest",
 			Message: err.Error(),
@@ -34,7 +34,7 @@ func SignUp(c *gin.Context) {
 		return
 	}
 
-	user, err := service.UserRegister(data)
+	user, err := service.UserRegister(reqBody.Data)
 	if err != nil {
 		if writeErr, ok := err.(mongo.WriteError); ok && writeErr.HasErrorCode(11000) {
 			c.JSON(http.StatusBadRequest, apierrors.BadRequest{

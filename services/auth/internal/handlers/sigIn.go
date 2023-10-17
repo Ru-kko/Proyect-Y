@@ -5,6 +5,7 @@ import (
 	"Proyect-Y/auth-service/internal/domain"
 	"Proyect-Y/auth-service/internal/middleware"
 	"Proyect-Y/auth-service/internal/security"
+	"Proyect-Y/typo"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -20,10 +21,10 @@ type tokenResponse struct {
 }
 
 func SignIn(c *gin.Context) {
-	var data domain.AuthCredentials
+	var reqBody typo.ForwardedRequest[domain.AuthCredentials]
 	logger := logrus.New()
 
-	if err := c.ShouldBindJSON(&data); err != nil {
+	if err := c.ShouldBindJSON(&reqBody); err != nil {
 		c.JSON(http.StatusBadRequest, apierrors.BadRequest{
 			Name:    "BadRequest",
 			Message: "Bad information",
@@ -40,7 +41,7 @@ func SignIn(c *gin.Context) {
 		})
 	}
 
-	usr, err := service.GetUserByTag(data.UserTag)
+	usr, err := service.GetUserByTag(reqBody.Data.UserTag)
 	if err != nil {
 		logger.WithError(err).Error("Singin error: ")
 		c.JSON(http.StatusInternalServerError, apierrors.InternalServerError{
@@ -53,12 +54,12 @@ func SignIn(c *gin.Context) {
 	if usr == nil {
 		c.JSON(http.StatusNotFound, apierrors.UserNotFound{
 			Name: "UserNotFound",
-			User: data.UserTag,
+			User: reqBody.Data.UserTag,
 		})
 		return
 	}
 
-	err = security.VerifyPassword(data.Password, usr.Password)
+	err = security.VerifyPassword(reqBody.Data.Password, usr.Password)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, apierrors.NotAuthorizedError{
 			Name:    "PasswordNotMatch",
