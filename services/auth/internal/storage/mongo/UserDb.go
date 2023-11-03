@@ -2,7 +2,7 @@ package mongo
 
 import (
 	"Proyect-Y/auth-service/internal/domain"
-	"Proyect-Y/auth-service/internal/util"
+	"Proyect-Y/common/util"
 	"context"
 
 	"go.mongodb.org/mongo-driver/bson"
